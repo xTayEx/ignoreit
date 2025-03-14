@@ -1,5 +1,5 @@
 -- main module file
-local module = require("plugin_name.module")
+local module = require("ignoreit.module")
 
 ---@class Config
 ---@field opt string Your config option
@@ -20,8 +20,15 @@ M.setup = function(args)
   M.config = vim.tbl_deep_extend("force", M.config, args or {})
 end
 
-M.hello = function()
-  return module.my_first_function(M.config.opt)
+M.entry = function(opts)
+  local args = opts.args:gsub("%s+", " ")
+  local subcommand = vim.split(args, " ")
+  if subcommand[1] == "list" then
+    module.show_available_lang()
+    return "good"
+  else
+    return module.gen_gitignore(M.config.opt)
+  end
 end
 
 return M
