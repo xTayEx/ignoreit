@@ -1,5 +1,5 @@
 -- main module file
-local module = require("ignoreit.module")
+local funcs = require("ignoreit.funcs")
 
 ---@class Config
 ---@field opt string Your config option
@@ -24,10 +24,10 @@ M.entry = function(opts)
   local args = opts.args:gsub("%s+", " ")
   local subcommand = vim.split(args, " ")
   if subcommand[1] == "list" then
-    module.show_available_lang()
+    funcs.show_available_lang_telescope(M.config)
     return "good"
   else
-    return module.gen_gitignore(M.config.opt)
+    return funcs.gen_gitignore(M.config.opt)
   end
 end
 

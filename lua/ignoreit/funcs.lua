@@ -3,16 +3,50 @@ local M = {}
 
 local Job = require("plenary.job")
 local Async = require("plenary.async")
-local AsyncUtils = require("plenary.async.util")
 local nui_popup = require("nui.popup")
 local nui_event = require("nui.utils.autocmd").event
+local lang_list = require("ignoreit.lang_list")
+
+-- import telescope related modules
+local pickers = require("telescope.pickers")
+local finders = require("telescope.finders")
+local conf = require("telescope.config").values
+local actions = require("telescope.actions")
+local action_state = require("telescope.actions.state")
+
 ---@return string
 M.gen_gitignore = function(greeting)
   print(greeting)
   return greeting
 end
 
-M.show_available_lang = function()
+M.show_available_lang_telescope = function(opts)
+  opts = opts or {}
+  opts = vim.tbl_deep_extend("force", require("telescope.themes").get_dropdown({}), opts)
+  pickers
+    .new(opts, {
+      prompt_title = "Available Languages",
+      finder = finders.new_table({
+        results = lang_list.lang_list,
+      }),
+      sorter = conf.generic_sorter(opts),
+      attach_mappings = function(prompt_bufnr, _)
+        actions.select_default:replace(function()
+          actions.close(prompt_bufnr)
+          local selection = action_state.get_selected_entry()
+          vim.notify("Selected: " .. selection[1], vim.log.levels.INFO)
+          -- print(vim.inspect(selection))
+          -- vim.api.nvim_put({ selection[1] }, "", false, true)
+        end)
+        return true
+      end,
+    })
+    :find()
+
+  -- print(lang_list.lang_list[1])
+end
+
+M.fetch_available_lang = function()
   -- curl -sL https://www.toptal.com/developers/gitignore/api/\$@
   local gitignore_provider_url = "https://www.toptal.com/developers/gitignore/api/"
   local available_lang_list = ""
