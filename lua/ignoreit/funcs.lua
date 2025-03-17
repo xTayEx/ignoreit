@@ -12,7 +12,6 @@ local conf = require("telescope.config").values
 local actions = require("telescope.actions")
 local action_state = require("telescope.actions.state")
 
-
 M.fetch_and_set_lang_gitignore = function(lang, root_dir)
   -- curl -sL https://www.toptal.com/developers/gitignore/api/\$@
   local gitignore_provider_url = "https://www.toptal.com/developers/gitignore/api/"
