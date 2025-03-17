@@ -40,29 +40,65 @@ M.fetch_and_set_lang_gitignore = function(lang, root_dir)
       return
     end
     gitignore_file:write(gitignore_content)
+    gitignore_file:close()
+
+    local cache_dir = vim.fn.stdpath("cache")
+    ---@diagnostic disable-next-line: param-type-mismatch
+    local gitignore_cache_dir = vim.fs.joinpath(cache_dir, lang .. ".gitignore")
+
+    local cache_file = io.open(gitignore_cache_dir, "w")
+    if cache_file == nil then
+      vim.notify("Error creating cache file", vim.log.levels.ERROR)
+      return
+    end
+    cache_file:write(gitignore_content)
+    cache_file:close()
   end
 
-  Async.run(request_func, create_gitignore_file)
+  local cache_dir = vim.fn.stdpath("cache")
+  ---@diagnostic disable-next-line: param-type-mismatch
+  local gitignore_cache_path = vim.fs.joinpath(cache_dir, lang .. ".gitignore")
+  if vim.fn.filereadable(gitignore_cache_path) == 0 then
+    Async.run(request_func, create_gitignore_file)
+  else
+    local gitignore_cache_file = io.open(gitignore_cache_path, "r")
+    if gitignore_cache_file == nil then
+      vim.notify("Error reading cache file", vim.log.levels.ERROR)
+      return
+    end
+    gitignore_content = gitignore_cache_file:read("a")
+    gitignore_cache_file:close()
+
+    local gitignore_file = io.open(root_dir .. "/.gitignore", "w")
+    if gitignore_file == nil then
+      vim.notify("Error creating .gitignore file", vim.log.levels.ERROR)
+      return
+    end
+    vim.notify("Using cached gitignore for " .. lang, vim.log.levels.INFO)
+    gitignore_file:write(gitignore_content)
+    gitignore_file:close()
+  end
 end
 
 local detect_root = function(rooter_method, opts)
   local root_dir = ""
   if rooter_method == "lsp" then
     root_dir = rooter.find_root_by_lsp()
-    return root_dir
   elseif rooter_method == "pattern" then
     root_dir = rooter.find_root_by_pattern(opts)
-    return root_dir
   else
     vim.notify("Invalid rooter method", vim.log.levels.ERROR)
     return nil
   end
+  root_dir = root_dir or vim.fn.getcwd()
+  return root_dir
 end
 
 ---@return integer
 M.generate_gitignore = function(lang, opts)
   local rooter_method = opts.rooter_method
   local root_dir = detect_root(rooter_method, opts)
+  vim.notify("Root dir is " .. root_dir, vim.log.levels.INFO)
   M.fetch_and_set_lang_gitignore(lang, root_dir)
 
   return 0

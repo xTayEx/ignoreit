@@ -4,7 +4,7 @@ local funcs = require("ignoreit.funcs")
 ---@field opt string
 local config = {
   root_patterns = {},
-  rooter_method = "lsp",
+  rooter_method = "pattern",
 }
 
 local M = {}
