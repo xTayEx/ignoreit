@@ -1,34 +1,19 @@
-# A Neovim Plugin Template
+# Ignoreit 🫥
+A neovim plugin to generate .gitignore file and place it in your project root. The gitignore content is fetched from https://www.toptal.com/developers/gitignore/api/
 
-![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/ellisonleao/nvim-plugin-template/lint-test.yml?branch=main&style=for-the-badge)
-![Lua](https://img.shields.io/badge/Made%20with%20Lua-blueviolet.svg?style=for-the-badge&logo=lua)
+# Dependencies
 
-A template repository for Neovim plugins.
+- curl
+- [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim)
 
-## Using it
+# Supported Platforms
+Only tested on archlinux, with neovim v0.10.4. Older neovim should work.
 
-Via `gh`:
+# Usage
+- `Gitignore`: Generate gitignore file iteratively. A telescope window will popup for selecting desired language.
+- `Gitignore <lang>`: Generate gitignore file corresponding to `<lang>` language directly.
 
-```
-$ gh repo create my-plugin -p ellisonleao/nvim-plugin-template
-```
-
-Via github web page:
-
-Click on `Use this template`
-
-![](https://docs.github.com/assets/cb-36544/images/help/repository/use-this-template-button.png)
-
-## Features and structure
-
-- 100% Lua
-- Github actions for:
-  - running tests using [plenary.nvim](https://github.com/nvim-lua/plenary.nvim) and [busted](https://olivinelabs.com/busted/)
-  - check for formatting errors (Stylua)
-  - vimdocs autogeneration from README.md file
-  - luarocks release (LUAROCKS_API_KEY secret configuration required)
-
-### Plugin structure
+# Plugin structure
 
 ```
 .
