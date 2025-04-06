@@ -4,14 +4,28 @@ A neovim plugin to generate .gitignore file and place it in your project root. T
 # Dependencies
 
 - curl
-- [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim)
+- (Optional) [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim)
+- (Optional) [snacks.nvim](https://github.com/folke/snacks.nvim)
 
 # Supported Platforms
-Only tested on archlinux, with neovim v0.10.4. Older neovim should work.
+Only tested on archlinux, with neovim v0.10.4 and v0.11.0. Older neovim may work.
 
 # Usage
 - `Gitignore`: Generate gitignore file iteratively. A telescope window will popup for selecting desired language.
 - `Gitignore <lang>`: Generate gitignore file corresponding to `<lang>` language directly.
+
+# Configuration
+
+`Ignoreit` has the following configurable options.
+```lua
+
+{
+    picker_provider = "telescope" | "snacks" | "ui_select" -- (backend to provide picker 
+                                                           -- ui when triggering `Gitignore`
+                                                           -- command. default: "snacks")
+}
+```
+
 
 # Plugin structure
 

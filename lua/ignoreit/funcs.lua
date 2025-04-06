@@ -99,11 +99,75 @@ M.generate_gitignore = function(lang, opts)
   return 0
 end
 
+---@diagnostic disable-next-line: unused-local
+local pick_by_snacks = function(root_dir, opts)
+  local Snacks = require("snacks")
+  local snack_items = {}
+  for _, item in ipairs(lang_list.lang_list) do
+    table.insert(snack_items, {
+      text = item,
+    })
+  end
+  Snacks.picker.pick({
+    source = "gitignore_supported_lang",
+    title = "Available Languages",
+    items = snack_items,
+    format = "text",
+    layout = {
+      preset = "vertical",
+      ---@diagnostic disable-next-line: assign-type-mismatch
+      preview = false,
+    },
+    confirm = function(picker, item)
+      picker:close()
+      M.fetch_and_set_lang_gitignore(item.text, root_dir)
+    end,
+  })
+end
+
+local pick_by_telescope = function(root_dir, opts)
+  local ts_pickers = require("telescope.pickers")
+  local ts_finders = require("telescope.finders")
+  local ts_conf = require("telescope.config").values
+  local ts_actions = require("telescope.actions")
+  local ts_action_state = require("telescope.actions.state")
+  local ts_opts = vim.tbl_deep_extend("force", require("telescope.themes").get_dropdown({}), opts)
+  ts_pickers
+      .new(ts_opts, {
+        prompt_title = "Available Languages",
+        finder = ts_finders.new_table({
+          results = lang_list.lang_list,
+        }),
+        sorter = ts_conf.generic_sorter(opts),
+        attach_mappings = function(prompt_bufnr, _)
+          ts_actions.select_default:replace(function()
+            ts_actions.close(prompt_bufnr)
+            local selected_lang = ts_action_state.get_selected_entry()[1]
+            M.fetch_and_set_lang_gitignore(selected_lang, root_dir)
+          end)
+          return true
+        end,
+      })
+      :find()
+end
+
+---@diagnostic disable-next-line: unused-local
+local function pick_by_ui_select(root_dir, opts)
+  vim.ui.select(lang_list.lang_list, {
+    prompt = "Available Languages",
+    format_item = function(item)
+      return item
+    end,
+  }, function(selected_lang)
+    M.fetch_and_set_lang_gitignore(selected_lang, root_dir)
+  end)
+end
+
 ---@return integer
 M.generate_gitignore_interactively = function(opts)
   opts = opts or {}
 
-  local picker_provider = opts.picker_provider or "snack"
+  local picker_provider = opts.picker_provider or "snacks"
 
   local rooter_method = opts.rooter_method
   local root_dir = detect_root(rooter_method, opts)
@@ -111,53 +175,16 @@ M.generate_gitignore_interactively = function(opts)
   local has_snacks_picker, _ = pcall(require, "snacks.picker")
 
   if has_snacks_picker and picker_provider == "snacks" then
-    local Snacks = require("snacks")
-    local snack_items = {}
-    for _, item in ipairs(lang_list.lang_list) do
-      table.insert(snack_items, {
-        text = item,
-      })
-    end
-    Snacks.picker.pick({
-      source = "gitignore_supported_lang",
-      items = snack_items,
-      format = "text",
-      layout = {
-        preset = "vertical",
-        ---@diagnostic disable-next-line: assign-type-mismatch
-        preview = false,
-      },
-      confirm = function(picker, item)
-        picker:close()
-        M.fetch_and_set_lang_gitignore(item.text, root_dir)
-      end,
-    })
+    pick_by_snacks(root_dir, opts)
   elseif has_telescope and picker_provider == "telescope" then
-    local ts_pickers = require("telescope.pickers")
-    local ts_finders = require("telescope.finders")
-    local ts_conf = require("telescope.config").values
-    local ts_actions = require("telescope.actions")
-    local ts_action_state = require("telescope.actions.state")
-    local ts_opts = vim.tbl_deep_extend("force", require("telescope.themes").get_dropdown({}), opts)
-    ts_pickers
-        .new(ts_opts, {
-          prompt_title = "Available Languages",
-          finder = ts_finders.new_table({
-            results = lang_list.lang_list,
-          }),
-          sorter = ts_conf.generic_sorter(opts),
-          attach_mappings = function(prompt_bufnr, _)
-            ts_actions.select_default:replace(function()
-              ts_actions.close(prompt_bufnr)
-              local selected_lang = ts_action_state.get_selected_entry()[1]
-              M.fetch_and_set_lang_gitignore(selected_lang, root_dir)
-            end)
-            return true
-          end,
-        })
-        :find()
+    pick_by_telescope(root_dir, opts)
+  elseif picker_provider == "ui_select" then
+    pick_by_ui_select(root_dir, opts)
   else
-    vim.notify("Wrong `picker_provider` value, or Telescope/snacks.nvim is not installed", vim.log.levels.ERROR)
+    vim.notify(
+      "Wrong `picker_provider` value" .. picker_provider .. ". Should be `snacks`, `telescope` or `ui_select`",
+      vim.log.levels.ERROR
+    )
   end
 
   return 0
