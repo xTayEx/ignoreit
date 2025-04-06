@@ -133,22 +133,22 @@ local pick_by_telescope = function(root_dir, opts)
   local ts_action_state = require("telescope.actions.state")
   local ts_opts = vim.tbl_deep_extend("force", require("telescope.themes").get_dropdown({}), opts)
   ts_pickers
-      .new(ts_opts, {
-        prompt_title = "Available Languages",
-        finder = ts_finders.new_table({
-          results = lang_list.lang_list,
-        }),
-        sorter = ts_conf.generic_sorter(opts),
-        attach_mappings = function(prompt_bufnr, _)
-          ts_actions.select_default:replace(function()
-            ts_actions.close(prompt_bufnr)
-            local selected_lang = ts_action_state.get_selected_entry()[1]
-            M.fetch_and_set_lang_gitignore(selected_lang, root_dir)
-          end)
-          return true
-        end,
-      })
-      :find()
+    .new(ts_opts, {
+      prompt_title = "Available Languages",
+      finder = ts_finders.new_table({
+        results = lang_list.lang_list,
+      }),
+      sorter = ts_conf.generic_sorter(opts),
+      attach_mappings = function(prompt_bufnr, _)
+        ts_actions.select_default:replace(function()
+          ts_actions.close(prompt_bufnr)
+          local selected_lang = ts_action_state.get_selected_entry()[1]
+          M.fetch_and_set_lang_gitignore(selected_lang, root_dir)
+        end)
+        return true
+      end,
+    })
+    :find()
 end
 
 ---@diagnostic disable-next-line: unused-local
