@@ -1,21 +1,21 @@
-local setup_plugin = function(plugins)
-  for _, plugin in ipairs(plugins) do
-    local plugin_dir = "/tmp/" .. vim.split(plugin, "/")[2]
-    local is_not_a_directory = vim.fn.isdirectory(plugin_dir) == 0
-    if is_not_a_directory then
-      vim.fn.system({ "git", "clone", "https://github.com/" .. plugin, plugin_dir })
-    end
-    vim.opt.rtp:append(plugin_dir)
-  end
-end
+vim.env.LAZY_STDPATH = "/tmp/.nvim_minimal"
+load(vim.fn.system("curl -s https://raw.githubusercontent.com/folke/lazy.nvim/main/bootstrap.lua"))()
 
-setup_plugin({
-  "nvim-lua/plenary.nvim",
-  "MunifTanjim/nui.nvim",
-  "nvim-telescope/telescope.nvim"
-})
+local plugins = {
+  {
+    dir = ".",
+    dependencies = {
+      { "nvim-telescope/telescope.nvim" },
+      { "folke/snacks.nvim" },
+    },
+    opts = {
+      picker_provider = "ui_select"
+    }
+  },
+  { "nvim-lua/plenary.nvim" },
+}
 
-vim.opt.rtp:append(".")
+require("lazy.minit").setup({ spec = plugins })
 
 vim.cmd("runtime plugin/plenary.vim")
 require("plenary.busted")
