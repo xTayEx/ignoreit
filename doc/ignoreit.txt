@@ -1,4 +1,4 @@
-*ignoreit.txt*         For Neovim >= 0.10.4         Last change: 2025 March 17
+*ignoreit.txt*         For Neovim >= 0.10.4         Last change: 2025 April 06
 
 ==============================================================================
 Table of Contents                                 *ignoreit-table-of-contents*
