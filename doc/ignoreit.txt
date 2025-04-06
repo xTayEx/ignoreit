@@ -7,7 +7,8 @@ Table of Contents                                 *ignoreit-table-of-contents*
 2. Dependencies                                        |ignoreit-dependencies|
 3. Supported Platforms                          |ignoreit-supported-platforms|
 4. Usage                                                      |ignoreit-usage|
-5. Plugin structure                                |ignoreit-plugin-structure|
+5. Configuration                                      |ignoreit-configuration|
+6. Plugin structure                                |ignoreit-plugin-structure|
 
 ==============================================================================
 1. Ignoreit                                               *ignoreit-ignoreit-*
@@ -21,13 +22,15 @@ https://www.toptal.com/developers/gitignore/api/
 2. Dependencies                                        *ignoreit-dependencies*
 
 - curl
-- telescope.nvim <https://github.com/nvim-telescope/telescope.nvim>
+- (Optional) telescope.nvim <https://github.com/nvim-telescope/telescope.nvim>
+- (Optional) snacks.nvim <https://github.com/folke/snacks.nvim>
 
 
 ==============================================================================
 3. Supported Platforms                          *ignoreit-supported-platforms*
 
-Only tested on archlinux, with neovim v0.10.4. Older neovim should work.
+Only tested on archlinux, with neovim v0.10.4 and v0.11.0. Older neovim may
+work.
 
 
 ==============================================================================
@@ -38,7 +41,22 @@ Only tested on archlinux, with neovim v0.10.4. Older neovim should work.
 
 
 ==============================================================================
-5. Plugin structure                                *ignoreit-plugin-structure*
+5. Configuration                                      *ignoreit-configuration*
+
+`Ignoreit` has the following configurable options.
+
+>lua
+    
+    {
+        picker_provider = "telescope" | "snacks" | "ui_select" -- (backend to provide picker 
+                                                               -- ui when triggering `Gitignore`
+                                                               -- command. default: "snacks")
+    }
+<
+
+
+==============================================================================
+6. Plugin structure                                *ignoreit-plugin-structure*
 
 >
     .
